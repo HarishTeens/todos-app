@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -40,8 +41,13 @@ func (u *User) TableName() string {
 
 func main() {
 	r := gin.Default()
-	dsn := "host=localhost user=postgres password=postgres dbname=mydb port=5432 sslmode=disable TimeZone=Asia/Kolkata"
-	pool, err := pgxpool.Connect(context.Background(), dsn)
+	dsn := "host=localhost user=postgres password=postgres dbname=mydb port=5432 sslmode=disable TimeZone=Asia/Kolkata "
+	config, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		fmt.Println(err)
+	}
+	pool, err := pgxpool.ConnectConfig(context.Background(), config)
+	pool.AcquireAllIdle(context.Background())
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
@@ -65,6 +71,8 @@ func main() {
 
 	r.GET("/todos/:id", func(c *gin.Context) {
 		user_id := c.Param("id")
+		xx := pool.Stat()
+		fmt.Println("statss ", " idle : ", xx.IdleConns()," acquired : ", xx.AcquiredConns(), " const : " , xx.ConstructingConns(), "max conns: ", xx.MaxConns(), "total ", xx.TotalConns())
 		ress, errrr := pool.Query(context.Background(), "SELECT * FROM todos where user_id = $1", user_id)
 		if errrr != nil {
 			log.Fatal(errrr)
