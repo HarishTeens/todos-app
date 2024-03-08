@@ -1,6 +1,8 @@
 from locust import HttpUser, task
+import random
 
 class HelloWorldUser(HttpUser):
     @task
     def hello_world(self):
-        self.client.get("/todos/4")
+        randuser = round(random.randint(1, 42000))
+        self.client.get(f"/todos/{randuser}")
