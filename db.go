@@ -10,7 +10,7 @@ import (
 var pool *pgxpool.Pool
 
 func initDB() {
-	dbUrl := "postgres://postgres:postgres@localhost:5432/mydb?sslmode=disable&pool_max_conns=12"
+	dbUrl := "postgres://postgres:postgres@localhost:5432/mydb?sslmode=disable&pool_max_conns=48"
 	config, err := pgxpool.ParseConfig(dbUrl)
 	if err != nil {
 		fmt.Println(err)
@@ -37,7 +37,7 @@ func insertUser(pool *pgxpool.Pool, insertUser User) (User, error) {
 	return insertUser, nil
 }
 
-func getUserById(pool *pgxpool.Pool, id int) (User, error) {
+func getUserByID(pool *pgxpool.Pool, id int) (User, error) {
 	var user User
 	res, err := pool.Query(context.Background(), "SELECT * FROM users WHERE id = $1", id)
 	if err != nil {
@@ -59,7 +59,7 @@ func getUserById(pool *pgxpool.Pool, id int) (User, error) {
 	return user, nil
 }
 
-func getTodosByUserId(pool *pgxpool.Pool, userId int) ([]Todo, error) {
+func getTodosByUserID(pool *pgxpool.Pool, userId int) ([]Todo, error) {
 	var todos []Todo
 	rows, err := pool.Query(context.Background(), "SELECT * FROM todos WHERE user_id = $1", userId)
 	if err != nil {
