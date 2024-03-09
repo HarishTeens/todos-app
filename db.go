@@ -10,8 +10,8 @@ import (
 var pool *pgxpool.Pool
 
 func initDB() {
-	dsn := "host=localhost user=postgres password=postgres dbname=mydb port=5432 sslmode=disable TimeZone=Asia/Kolkata "
-	config, err := pgxpool.ParseConfig(dsn)
+	dbUrl := "postgres://postgres:postgres@localhost:5432/mydb?sslmode=disable&pool_max_conns=12"
+	config, err := pgxpool.ParseConfig(dbUrl)
 	if err != nil {
 		fmt.Println(err)
 	}
