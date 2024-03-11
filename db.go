@@ -11,8 +11,8 @@ import (
 var pool *pgxpool.Pool
 
 func initDB() {
-dbUrl := os.Getenv("DB_URL")
-config, err := pgxpool.ParseConfig(dbUrl)
+	dbUrl := os.Getenv("DB_URL")
+	config, err := pgxpool.ParseConfig(dbUrl)
 	if err != nil {
 		fmt.Println(err)
 	}

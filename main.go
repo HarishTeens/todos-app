@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"gorm.io/gorm"
 )
@@ -33,8 +34,8 @@ func (u *User) TableName() string {
 
 func main() {
 	r := gin.Default()
+	godotenv.Load(".env")
 	initDB()
-
 	r.GET("/ping", pong)
 
 	r.POST("/users", addUser)
