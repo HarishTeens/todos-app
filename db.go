@@ -10,8 +10,9 @@ import (
 var pool *pgxpool.Pool
 
 func initDB() {
-	dbUrl := "postgres://postgres:postgres@localhost:5432/mydb?sslmode=disable&pool_max_conns=48"
-	config, err := pgxpool.ParseConfig(dbUrl)
+//	dbUrl := "postgres://postgres:postgres@localhost:5432/mydb?sslmode=disable&pool_max_conns=48"
+dbUrl := "postgres://postgres:admin@34.133.75.164:5432/mydb?sslmode=disable&pool_max_conns=390"
+config, err := pgxpool.ParseConfig(dbUrl)
 	if err != nil {
 		fmt.Println(err)
 	}
