@@ -34,5 +34,29 @@ even at 1Million concurrent users it was running alrighty.
     Another solution is to use IP aliasing but it didnt get picked up automatically.
 
 
+<hr/>
+
+###  Signoz Setup
+
+Install
+
+```
+git clone -b main https://github.com/SigNoz/signoz.git
+cd signoz/deploy/
+./install.sh
+```
+Run
+
+```
+SERVICE_NAME=goTodosApp INSECURE_MODE=true OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317 go run *.go
+```
+
+Stop
+
+```
+docker-compose -f ./docker/clickhouse-setup/docker-compose.yaml down -v
+```
+
+
 ### Huge thanks to
 - [Scaling to 12 Million](https://mrotaru.wordpress.com/2013/10/10/scaling-to-12-million-concurrent-connections-how-migratorydata-did-it/)
