@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"gorm.io/gorm"
 )
 
@@ -33,7 +36,10 @@ func (u *User) TableName() string {
 }
 
 func main() {
+	cleanup := initTracer()
+    defer cleanup(context.Background())
 	r := gin.Default()
+	r.Use(otelgin.Middleware(serviceName))
 	godotenv.Load(".env")
 	initDB()
 	r.GET("/ping", pong)

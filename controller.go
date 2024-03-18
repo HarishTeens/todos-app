@@ -15,7 +15,7 @@ func pong(c *gin.Context) {
 }
 
 func addUser(c *gin.Context) {
-	insertUser,err := insertUser(pool, User{Name: "blah"})
+	insertUser,err := insertUser(pool, User{Name: "blah"}, c.Request.Context())
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -37,7 +37,7 @@ func getTodo(c *gin.Context) {
 	errCh := make(chan error)
 
 	go func ()  {
-		user, _ := getUserByID(pool, int(userID))
+		user, _ := getUserByID(pool, int(userID), c.Request.Context())
 		if user.ID == 0 {
 			errCh <- fmt.Errorf("user with id %v not found", userID)
 			return
@@ -61,7 +61,7 @@ func getTodo(c *gin.Context) {
 
 	// Fetch todos concurrently
 	go func() {
-		todos, err := getTodosByUserID(pool, int(user.ID))
+		todos, err := getTodosByUserID(pool, int(user.ID), c.Request.Context())
 		if err != nil {
 			errCh <- err
 			return
@@ -88,7 +88,7 @@ func getTodo(c *gin.Context) {
 
 func addTodoToUser(c *gin.Context) {
 	user_id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	user, _ := getUserByID(pool, int(user_id))
+	user, _ := getUserByID(pool, int(user_id), c.Request.Context())
 	if user.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error_message": fmt.Sprintf("user with id %v not found", user_id),
@@ -96,7 +96,7 @@ func addTodoToUser(c *gin.Context) {
 		return
 	}
 
-	insertTodo, err := addTodosForUser(pool, int(user_id), Todo{Todo: "blah todo"})
+	insertTodo, err := addTodosForUser(pool, int(user_id), Todo{Todo: "blah todo"}, c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error_message": err,

@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/exaring/otelpgx"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 var pool *pgxpool.Pool
 
@@ -16,15 +17,16 @@ func initDB() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	pool, err = pgxpool.ConnectConfig(context.Background(), config)
+	config.ConnConfig.Tracer = otelpgx.NewTracer()
+	pool, err = pgxpool.NewWithConfig(context.Background(), config)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
-	pool.AcquireAllIdle(context.Background())
 }
 
-func insertUser(pool *pgxpool.Pool, insertUser User) (User, error) {
-	res, err := pool.Query(context.Background(), "INSERT INTO users (name) VALUES ($1) RETURNING id", insertUser.Name)
+func insertUser(pool *pgxpool.Pool, insertUser User, ctx context.Context) (User, error) {
+	res, err := pool.Query(ctx, "INSERT INTO users (name) VALUES ($1) RETURNING id", insertUser.Name)
 	if err != nil {
 		return User{}, errors.Join(errors.New("error inserting user: "), err)
 	}
@@ -38,9 +40,9 @@ func insertUser(pool *pgxpool.Pool, insertUser User) (User, error) {
 	return insertUser, nil
 }
 
-func getUserByID(pool *pgxpool.Pool, id int) (User, error) {
+func getUserByID(pool *pgxpool.Pool, id int, ctx context.Context) (User, error) {
 	var user User
-	res, err := pool.Query(context.Background(), "SELECT * FROM users WHERE id = $1", id)
+	res, err := pool.Query(ctx, "SELECT * FROM users WHERE id = $1", id)
 	if err != nil {
 		return User{}, errors.Join(errors.New("error getting user: "), err)
 	}
@@ -60,9 +62,9 @@ func getUserByID(pool *pgxpool.Pool, id int) (User, error) {
 	return user, nil
 }
 
-func getTodosByUserID(pool *pgxpool.Pool, userId int) ([]Todo, error) {
+func getTodosByUserID(pool *pgxpool.Pool, userId int, ctx context.Context) ([]Todo, error) {
 	var todos []Todo
-	rows, err := pool.Query(context.Background(), "SELECT * FROM todos WHERE user_id = $1", userId)
+	rows, err := pool.Query(ctx, "SELECT * FROM todos WHERE user_id = $1", userId)
 	if err != nil {
 		return []Todo{}, errors.Join(errors.New("error getting todos: "), err)
 	}
@@ -77,8 +79,8 @@ func getTodosByUserID(pool *pgxpool.Pool, userId int) ([]Todo, error) {
 	return todos, nil
 }
 
-func addTodosForUser(pool *pgxpool.Pool, user_id int, todo Todo) (Todo, error) {
-	res, err := pool.Query(context.Background(), "INSERT INTO todos (todo, user_id) VALUES ($1, $2) RETURNING id", todo.Todo, user_id)
+func addTodosForUser(pool *pgxpool.Pool, user_id int, todo Todo, ctx context.Context) (Todo, error) {
+	res, err := pool.Query(ctx, "INSERT INTO todos (todo, user_id) VALUES ($1, $2) RETURNING id", todo.Todo, user_id)
 	if err != nil {
 		return Todo{}, errors.Join(errors.New("error inserting todo: "), err)
 	}
