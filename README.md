@@ -34,5 +34,38 @@ even at 1Million concurrent users it was running alrighty.
     Another solution is to use IP aliasing but it didnt get picked up automatically.
 
 
+<hr/>
+
+1. Use Premium Tier Networking: GCP offers premium tier networking, which can provide lower latency and higher reliability compared to standard tier networking. Consider using premium tier networking for your instances.
+2. Leverage Google's Network Backbone: GCP benefits from Google's extensive global network infrastructure, including high-capacity fiber optic cables. Utilize this backbone for faster data transmission between regions and zones.
+3. Utilize Content Delivery Networks (CDNs): Distribute your static content and assets through a CDN like Google Cloud CDN or other third-party CDNs. CDNs cache content closer to users, reducing latency by serving content from edge locations.
+4. Implement HTTP/2 or QUIC: Use modern protocols like HTTP/2 or QUIC, which are designed to reduce latency through techniques such as multiplexing, header compression, and connection reuse.
+5. Tune TCP/IP Parameters: Adjust TCP/IP settings on your VM instances to optimize network performance. This may include tuning parameters like TCP window size, TCP congestion control algorithms, and TCP keepalive settings.
+6. Reduce Packet Loss and Jitter: Minimize packet loss and jitter by using reliable network connections and optimizing network configurations. High packet loss and jitter can significantly impact latency-sensitive applications.
+
+<hr/>
+
+###  Signoz Setup
+
+Install
+
+```
+git clone -b main https://github.com/SigNoz/signoz.git
+cd signoz/deploy/
+./install.sh
+```
+Run
+
+```
+SERVICE_NAME=goTodosApp INSECURE_MODE=true OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317 go run *.go
+```
+
+Stop
+
+```
+docker-compose -f ./docker/clickhouse-setup/docker-compose.yaml down -v
+```
+
+
 ### Huge thanks to
 - [Scaling to 12 Million](https://mrotaru.wordpress.com/2013/10/10/scaling-to-12-million-concurrent-connections-how-migratorydata-did-it/)
