@@ -11,5 +11,5 @@ class HelloWorldUser(FastHttpUser):
     @task
     def hello_world(self):
         randuser = round(random.randint(1, 52000))
-        self.client.get(f"/todos/{randuser}", base_url=self.get_base_url())
+        self.client.get(f"/todos/{randuser}")
         
